@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!-- Allow cleartext traffic for the specific domain -->
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">elms.wrteam.me</domain>
+    </domain-config>
+
+    <!-- Optional: For development/testing, you can allow all cleartext traffic -->
+    <!-- Remove or comment out in production for better security -->
+    <!-- <base-config cleartextTrafficPermitted="true" /> -->
+</network-security-config>

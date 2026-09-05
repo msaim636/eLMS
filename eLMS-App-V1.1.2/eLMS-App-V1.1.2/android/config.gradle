@@ -1,0 +1,4 @@
+// App Configuration
+ext.APP_NAME = "eLMS"
+ext.DEEP_LINK_SCHEMA = "elms"
+ext.PACKAGE_NAME = "com.wrteam.elms"

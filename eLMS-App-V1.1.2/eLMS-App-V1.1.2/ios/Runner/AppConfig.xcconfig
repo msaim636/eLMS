@@ -1,0 +1,8 @@
+
+
+/// Please Add Configuration details directly here instead of changing in Files
+APP_NAME = eLMS
+BUNDLE_IDENTIFIER = com.wrteam.elms
+REVERSE_CLIENT_ID = ID
+ENCODED_APP_ID = ID
+DEEP_LINK_SCHEMA = elms

@@ -1,0 +1,203 @@
+plugins {
+    id "com.android.application"
+    id "kotlin-android"
+    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
+    id "dev.flutter.flutter-gradle-plugin"
+    // Add the Google services Gradle plugin
+    id "com.google.gms.google-services"
+    id "com.google.firebase.crashlytics"
+}
+
+def keystoreProperties = new Properties()
+def keystorePropertiesFile = rootProject.file('keystore.properties')
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
+android {
+    namespace = rootProject.ext.PACKAGE_NAME
+    compileSdk = flutter.compileSdkVersion
+    //ndkVersion = flutter.ndkVersion
+    ndkVersion = "28.2.13676358"
+ 
+    compileOptions {
+        coreLibraryDesugaringEnabled true
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = "17"
+    }
+
+    defaultConfig {
+        // Application ID from config.gradle
+        applicationId = rootProject.ext.PACKAGE_NAME
+        // You can update the following values to match your application needs.
+        // For more information, see: https://flutter.dev/to/review-gradle-config.
+        minSdk = 24
+        targetSdk = flutter.targetSdkVersion
+        versionCode = flutter.versionCode
+        versionName = flutter.versionName
+
+        ///Register manifest variable here
+        manifestPlaceholders = [
+            APP_NAME: rootProject.ext.APP_NAME,
+            DEEP_LINK_SCHEMA: rootProject.ext.DEEP_LINK_SCHEMA,
+            PACKAGE_NAME: rootProject.ext.PACKAGE_NAME
+        ]
+
+        // Patrol test runner configuration
+        testInstrumentationRunner = "pl.leancode.patrol.PatrolJUnitRunner"
+        testInstrumentationRunnerArguments["clearPackageData"] = "true"
+    }
+
+    testOptions {
+        execution = "ANDROIDX_TEST_ORCHESTRATOR"
+    }
+
+    signingConfigs {
+        release {
+            if (keystorePropertiesFile.exists()) {
+                keyAlias keystoreProperties['keyAlias']
+                keyPassword keystoreProperties['keyPassword']
+                storeFile file(keystoreProperties['storeFile'])
+                storePassword keystoreProperties['storePassword']
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            def useRelease = keystorePropertiesFile.exists() && keystoreProperties['useReleaseKeystore'] == 'true'
+            signingConfig = useRelease ? signingConfigs.release : signingConfigs.debug
+        }
+    }
+}
+
+flutter {
+    source = "../.."
+}
+
+// ========== AUTO PACKAGE SYNC TASK ==========
+// This task automatically syncs the Kotlin package structure and declarations
+// with the PACKAGE_NAME defined in config.gradle before compilation
+task syncPackageStructure {
+    doLast {
+        def targetPackage = rootProject.ext.PACKAGE_NAME
+        def kotlinBaseDir = file("src/main/kotlin")
+
+        if (!kotlinBaseDir.exists()) {
+            println "⚠️  Kotlin directory not found: ${kotlinBaseDir.path}"
+            return
+        }
+
+        // Find all .kt files recursively
+        def ktFiles = []
+        kotlinBaseDir.eachFileRecurse { file ->
+            if (file.name.endsWith('.kt')) {
+                ktFiles << file
+            }
+        }
+
+        if (ktFiles.isEmpty()) {
+            println "⚠️  No Kotlin files found in ${kotlinBaseDir.path}"
+            return
+        }
+
+        // Detect current package from first .kt file
+        def currentPackage = null
+        def firstKtFile = ktFiles[0]
+        firstKtFile.eachLine { line ->
+            if (line.trim().startsWith('package ')) {
+                currentPackage = line.trim().replaceAll(/^package\s+/, '').replaceAll(/\s*$/, '')
+                return true // break
+            }
+        }
+
+        if (currentPackage == null) {
+            println "⚠️  Could not detect current package from ${firstKtFile.name}"
+            return
+        }
+
+        // Check if sync is needed
+        if (currentPackage == targetPackage) {
+            println "✅ Package structure already matches: ${targetPackage}"
+            return
+        }
+
+        println "🔄 Syncing package structure..."
+        println "   Current: ${currentPackage}"
+        println "   Target:  ${targetPackage}"
+
+        // Create new package directory structure
+        def targetPath = targetPackage.replace('.', '/')
+        def targetDir = new File(kotlinBaseDir, targetPath)
+        targetDir.mkdirs()
+
+        // Move and update each .kt file
+        def movedCount = 0
+        ktFiles.each { ktFile ->
+            // Read file content
+            def content = ktFile.text
+
+            // Update package declaration
+            def updatedContent = content.replaceFirst(
+                /package\s+${java.util.regex.Pattern.quote(currentPackage)}/,
+                "package ${targetPackage}"
+            )
+
+            // Write to new location
+            def targetFile = new File(targetDir, ktFile.name)
+            targetFile.text = updatedContent
+
+            // Delete old file if it's different location
+            if (ktFile.absolutePath != targetFile.absolutePath) {
+                ktFile.delete()
+                movedCount++
+            }
+
+            println "   ✓ ${ktFile.name}"
+        }
+
+        // Clean up old empty directories
+        def oldPath = currentPackage.replace('.', '/')
+        def oldDir = new File(kotlinBaseDir, oldPath)
+        if (oldDir.exists() && oldDir.list().length == 0) {
+            deleteEmptyParentDirs(oldDir, kotlinBaseDir)
+        }
+
+        println "✅ Package sync complete! Moved ${movedCount} file(s) to ${targetPackage}"
+    }
+}
+
+// Helper function to delete empty parent directories
+def deleteEmptyParentDirs(File dir, File stopAt) {
+    if (dir == null || !dir.exists() || dir.equals(stopAt)) {
+        return
+    }
+    if (dir.list().length == 0) {
+        def parent = dir.parentFile
+        dir.delete()
+        deleteEmptyParentDirs(parent, stopAt)
+    }
+}
+
+// Run before compilation
+tasks.configureEach { task ->
+    if (task.name == 'preBuild') {
+        task.dependsOn syncPackageStructure
+    }
+}
+// ========== END AUTO PACKAGE SYNC TASK ==========
+
+dependencies {
+    implementation platform('com.google.firebase:firebase-bom:33.1.1')
+    implementation "com.google.firebase:firebase-messaging"
+
+    // Core library desugaring for flutter_local_notifications
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.4'
+
+    // Patrol test dependencies
+    androidTestUtil("androidx.test:orchestrator:1.5.1")
+}

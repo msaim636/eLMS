@@ -1,0 +1,7 @@
+V1.1.2
+
+---
+Flutter (Channel stable, 3.41.7, on macOS 26.1 25B78 darwin-arm64, locale en-US)
+Dart SDK version: 3.11.5 (stable) (Wed Apr 15 00:36:32 2026 -0700) on "macos_arm64"
+Android toolchain - develop for Android devices (Android SDK version 36.1.0)
+Xcode - develop for iOS and macOS (Xcode 26.2)

@@ -1,0 +1,120 @@
+name: elms
+description: "A new Flutter project."
+
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+version: 1.1.1+14 #application version build-name and --build-number
+
+environment:
+  sdk: ">=3.10.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  flutter_localizations:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  shared_preferences: ^2.2.2
+  flutter_bloc: ^8.1.3
+  http: ^1.1.0
+  cached_network_image: 3.4.1
+  flutter_svg: ^2.0.7
+  dio: ^5.9.0
+  hive_flutter: ^1.1.0
+  google_sign_in: ^7.2.0
+  sign_in_with_apple: ^7.0.1
+  pin_code_fields: ^8.0.1
+  get: ^4.7.3
+  connectivity_plus: ^5.0.1
+  firebase_core: ^4.2.1
+  firebase_auth: ^6.1.2
+  equatable: ^2.0.5
+  country_code_picker: ^3.3.0
+  firebase_messaging: ^16.0.4
+  youtube_player_flutter: ^9.1.1
+  video_player: ^2.11.1
+  screen_brightness: ^2.1.1
+
+  image_picker: ^1.1.2
+  bloc: any
+  dotted_border: ^2.1.0
+  shimmer: ^3.0.0
+  collection: any
+  device_region: ^1.4.0
+  webview_flutter: ^4.4.2
+  webview_flutter_android: ^3.14.0
+  webview_flutter_wkwebview: ^3.10.0
+  open_file: ^3.5.10
+  path_provider: ^2.1.5
+  file_picker: ^8.1.6
+  share_plus: ^10.1.4
+  url_launcher: ^6.3.1
+  flutter_local_notifications: ^19.2.1
+  app_links: ^6.4.1
+  intl: ^0.20.2
+  video_thumbnail: ^0.5.6
+
+  screen_protector: ^1.4.2
+  just_audio: ^0.9.42
+  encrypt: ^5.0.3
+  flutter_html: ^3.0.0-beta.2
+  package_info_plus: ^9.0.0
+  flutter_country_state: ^1.0.1
+  firebase_crashlytics: ^5.0.7
+  in_app_purchase: ^3.2.0
+  phone_numbers_parser: ^9.0.22
+  crypto: ^3.0.7
+
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+  patrol: ^4.1.1
+
+patrol:
+  app_name: elms
+  android:
+    package_name: com.wrteam.elms
+  ios:
+    bundle_id: com.wrteam.elms
+
+
+
+flutter:
+  uses-material-design: true
+
+
+  assets:
+    - assets/languages/
+    - assets/images/illustrators/
+    - assets/icons/
+    - assets/images/quiz.png
+    - assets/images/certificate_bg.png
+    - assets/images/wallet_bg.png
+
+
+  fonts:
+    - family: Geist
+      fonts:
+        - asset: assets/fonts/Geist-Black.ttf
+          weight: 900
+        - asset: assets/fonts/Geist-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Geist-ExtraBold.ttf
+          weight: 800
+        - asset: assets/fonts/Geist-ExtraLight.ttf
+          weight: 200
+        - asset: assets/fonts/Geist-Light.ttf
+          weight: 300
+        - asset: assets/fonts/Geist-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Geist-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Geist-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Geist-Thin.ttf
+          weight: 100  
+
+
